@@ -88,6 +88,21 @@ function Nav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
   const close = () => setOpen(false);
+  // scrollspy: the last nav section whose top has passed just under the fixed nav
+  const [active, setActive] = useState('');
+  useEffect(() => {
+    const onScroll = () => {
+      let cur = '';
+      for (const [href] of navLinks) {
+        const el = document.querySelector(href);
+        if (el && el.getBoundingClientRect().top <= 140) cur = href;
+      }
+      setActive(cur);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   return (
     <nav className={'nav' + (open ? ' open' : '')}>
       <a href="#" className="logo" aria-label="Unicool Ecotech — home" onClick={close}><Logo /></a>
@@ -97,7 +112,9 @@ function Nav() {
         </svg>
       </button>
       <div id="nav-links" className="nav-links">
-        {navLinks.map(([href, label]) => <a key={href} href={href} className="nav-link" onClick={close}>{label}</a>)}
+        {navLinks.map(([href, label]) => (
+          <a key={href} href={href} className={'nav-link' + (active === href ? ' active' : '')} aria-current={active === href ? 'location' : undefined} onClick={close}>{label}</a>
+        ))}
         <a href="#contact" className="nav-cta" onClick={close}>Enquire</a>
       </div>
     </nav>
@@ -165,7 +182,15 @@ function Hero({ parallax }) {
           <path d={LEAF} fill="url(#leafG1)" />
           <path d={LEAF_RIB} stroke="#134f27" strokeWidth="1.6" fill="none" opacity="0.6" />
         </svg>
-        <img src="assets/hero-pad.png" alt="Unicool honeycomb cellulose cooling pad" className="hero-img" style={{ transform: `translateY(${parallax}px)` }} />
+        <div className="hero-stage" style={{ transform: `translateY(${parallax}px)` }}>
+          <span className="ripple" />
+          <span className="ripple" />
+          <span className="ripple" />
+          <div className="water-layer">
+            <img src="assets/hero-water.webp" alt="" className="hero-water" />
+          </div>
+          <img src="assets/hero-pad-wet.webp" alt="Unicool honeycomb cellulose cooling pad in water" className="hero-img" />
+        </div>
       </div>
     </section>
   );
@@ -213,6 +238,12 @@ function Products() {
               <h3 className="product-name">{p.name}</h3>
               <p className="product-text">{p.body}</p>
               <div className="product-pill">{p.meta}</div>
+              {p.flutes && (
+                <div className="product-flutes">
+                  <span>Flute sizes</span>
+                  {p.flutes.map((f) => <b key={f}>{f}</b>)}
+                </div>
+              )}
               <div className="product-features">
                 {p.features.map(([icon, label]) => (
                   <div key={label} className="product-feature">
@@ -319,18 +350,78 @@ function Model() {
 }
 
 function Process() {
+  const n = processSteps.length;
+  const [i, setI] = useState(0);
+  const still = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // auto-advance every 3.5s; a click jumps to that step and the countdown restarts from there
+  useEffect(() => {
+    if (still) return;
+    const t = setTimeout(() => setI((x) => (x + 1) % n), 3500);
+    return () => clearTimeout(t);
+  }, [i, still, n]);
+  const pick = (k) => setI((k + n) % n);
+  const s = processSteps[i];
+  const num = (k) => String(k + 1).padStart(2, '0');
+  const C = 2 * Math.PI * 38; // ring circumference in the 100x100 viewBox
   return (
-    <section id="process" className="section">
-      <div className="eyebrow teal">HOW IT WORKS</div>
-      <h2 className="h2" style={{ marginBottom: 48 }}>Three steps to cooler air.</h2>
-      <div className="grid" style={autoGrid(250, 28)}>
-        {processSteps.map((s) => (
-          <div key={s.num} className="step">
-            <div className="step-num">{s.num}</div>
-            <div className="step-title">{s.title}</div>
-            <div className="step-body">{s.body}</div>
+    <section id="process" className="section making">
+      <div className="making-head">
+        <div>
+          <div className="products-eyebrow">HOW IT WORKS <span className="rule" style={{ width: 54, background: '#0b7f77' }} /></div>
+          <h2 className="products-title" style={{ marginBottom: 0 }}>How our pads <span>are made.</span></h2>
+        </div>
+        <p className="products-lead why-lead" style={{ margin: 0 }}>Eight in-house stages take raw kraft paper to a finished, water-tested honeycomb cooling pad, all under one roof.</p>
+      </div>
+      <div className="making-wrap">
+        <div className="wheel-box">
+          <div className="wheel">
+            <svg viewBox="0 0 100 100" className="wheel-ring" aria-hidden="true">
+              <circle cx="50" cy="50" r="38" />
+              <circle cx="50" cy="50" r="38" className="wheel-progress" style={{ strokeDasharray: C, strokeDashoffset: C * (1 - i / n) }} />
+            </svg>
+            {processSteps.map((p, k) => {
+              const a = (k / n) * 2 * Math.PI;
+              const pos = (r) => ({ left: `${50 + r * Math.sin(a)}%`, top: `${50 - r * Math.cos(a)}%` });
+              return (
+                <div key={p.title}>
+                  <button type="button" className={'wheel-node' + (k === i ? ' on' : k < i ? ' done' : '')} style={pos(38)} onClick={() => pick(k)} aria-label={`Step ${k + 1}: ${p.title}`} aria-pressed={k === i}>
+                    <img src={p.photo} alt="" loading="lazy" />
+                    <span>{num(k)}</span>
+                  </button>
+                  <span className={'wheel-label' + (k === i ? ' on' : '')} style={pos(52)} aria-hidden="true">{p.short}</span>
+                </div>
+              );
+            })}
+            <div className="wheel-hub" aria-hidden="true">
+              <div className="wheel-spin" />
+              <div className="wheel-hub-inner">
+                <small>STEP</small>
+                <b key={i}>{num(i)}</b>
+                <span>{s.short}</span>
+              </div>
+            </div>
           </div>
-        ))}
+        </div>
+        <article className="making-card" aria-live="polite">
+          <div className="making-photo">
+            {/* all photos stacked; only the active one is visible, so changes crossfade instead of popping */}
+            {processSteps.map((p, k) => (
+              <img key={p.photo} src={p.photo} alt={k === i ? `${p.title} at the Unicool Ecotech factory` : ''} className={k === i ? 'on' : ''} />
+            ))}
+            <span className="making-chip">{num(i)} / {num(n - 1)}</span>
+          </div>
+          <div className="making-body">
+            <h3 key={s.title}>{s.title}</h3>
+            <p key={s.body}>{s.body}</p>
+            <div className="making-nav">
+              <button type="button" onClick={() => pick(i - 1)} aria-label="Previous step"><Icon d="M19 12H5M12 19l-7-7 7-7" size={18} width={2} join="round" /></button>
+              <button type="button" onClick={() => pick(i + 1)} aria-label="Next step"><Icon d={ICONS.arrow} size={18} width={2} join="round" /></button>
+              <div className="making-dots">
+                {processSteps.map((p, k) => <button key={p.title} type="button" className={k === i ? 'on' : ''} onClick={() => pick(k)} aria-label={`Go to step ${k + 1}`} />)}
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
   );
@@ -346,7 +437,41 @@ function About() {
         <p>We supply distributors and OEMs with standard stock sizes and made-to-drawing custom cuts, backed by consistent lead times and bulk pricing.</p>
       </div>
       <div className="about-media">
-        <img src="assets/pad-angle-2.png" alt="Unicool Ecotech honeycomb cooling pad" className="cutout" />
+        <img src="assets/factory.jpg" alt="Unicool Ecotech factory in Sakariya Industrial Area, Nimbahera" className="about-photo" loading="lazy" />
+        <span className="about-tag"><Icon d={ICONS.pin} size={15} width={2} join="round" /> Our Factory &middot; Nimbahera, Rajasthan</span>
+      </div>
+    </section>
+  );
+}
+
+const leaders = [
+  { img: 'assets/team/ceo-1.jpg', name: 'Ravindra Pokharna', title: 'Founder \u00b7 Neemuch, MP', quote: 'Every pad that leaves our floor carries our name. That is why we build each one to the same spec.' },
+  { img: 'assets/team/ceo-2.jpg', name: 'Sapna Jain', title: 'Founder \u00b7 Mumbai, MH', quote: 'Our customers grow with us because we treat every order, big or small, like our only one.' },
+];
+
+function Leadership() {
+  return (
+    <section id="leadership" className="leadership">
+      <div className="why-head">
+        <div>
+          <div className="products-eyebrow">LEADERSHIP <span className="rule" style={{ width: 54, background: '#0b7f77' }} /></div>
+          <h2 className="products-title" style={{ marginBottom: 0 }}>The people <span>behind Unicool.</span></h2>
+        </div>
+        <p className="products-lead why-lead">Two leaders, one standard: honest cooling pads, made in-house and delivered on time.</p>
+      </div>
+      <div className="leaders">
+        {leaders.map((l) => (
+          <figure key={l.img} className="leader">
+            <div className="leader-photo">
+              <img src={l.img} alt={l.name} loading="lazy" />
+              <figcaption className="leader-card">
+                <strong>{l.name}</strong>
+                <span>{l.title}</span>
+              </figcaption>
+            </div>
+            <blockquote className="leader-quote">&ldquo;{l.quote}&rdquo;</blockquote>
+          </figure>
+        ))}
       </div>
     </section>
   );
@@ -418,8 +543,8 @@ function Gallery() {
       <div className="gallery-head">
         <div>
           <div className="products-eyebrow">GALLERY <span className="rule" style={{ width: 34, background: '#0b7f77' }} /></div>
-          <h2 className="products-title" style={{ marginBottom: 14 }}>Explore Our<br /><span>Cooling Pads</span></h2>
-          <p className="products-lead" style={{ marginBottom: 0 }}>A closer look at our honeycomb cooling pads, crafted for performance, durability and sustainable cooling.</p>
+          <h2 className="products-title" style={{ marginBottom: 14 }}>Explore Our<br /><span>Products</span></h2>
+          <p className="products-lead" style={{ marginBottom: 0 }}>A closer look at our honeycomb cooling pads and industrial air coolers, built for performance, durability and sustainable cooling.</p>
         </div>
         <div className="gallery-badges">
           {galleryBadges.map((x) => (
@@ -442,8 +567,8 @@ function Gallery() {
       <div className="gallery-grid">
         {items.map((g) => (
           <figure key={g.photo} className="gallery-card">
-            <div className="gallery-media">
-              <img src={g.photo} alt={`${g.cat} \u2014 ${g.view}`} className="cutout" />
+            <div className="gallery-media" style={g.bg && { background: g.bg }}>
+              <img src={g.photo} alt={`${g.cat} \u2014 ${g.view}`} className={'cutout' + (g.bg ? ' flat' : '')} />
               <button type="button" className="gallery-zoom" onClick={() => open(g)} aria-label={`Enlarge ${g.view}`}>
                 <Icon d={ICONS.expand} size={15} width={2} join="round" />
               </button>
@@ -467,7 +592,7 @@ function Gallery() {
 
       {/* native <dialog>: Esc closes it, focus is handled by the browser */}
       <dialog ref={dialog} className="gallery-dialog" onClick={(e) => e.target === dialog.current && dialog.current.close()}>
-        {zoom && <img src={zoom.photo} alt={`${zoom.cat} \u2014 ${zoom.view}`} />}
+        {zoom && <img src={zoom.photo} alt={`${zoom.cat} \u2014 ${zoom.view}`} style={zoom.bg && { background: zoom.bg }} />}
         {zoom && <p><b>{zoom.cat}</b> &middot; {zoom.view}</p>}
         <button type="button" className="gallery-close" onClick={() => dialog.current.close()} aria-label="Close">
           <Icon d={ICONS.close} size={18} width={2} join="round" />
@@ -505,7 +630,6 @@ function Certifications() {
               <span className="product-pill" style={{ marginBottom: 12 }}>{c.name}</span>
               <h3 className="cert-title">{c.title}</h3>
               <p className="cert-text">{c.body}</p>
-              <a href="#contact" className="product-link cert-link">Learn more <Icon d={ICONS.arrow} size={16} width={2} join="round" /></a>
             </div>
           </article>
         ))}
@@ -586,7 +710,8 @@ function Faq() {
             <p>Have more questions or need a custom solution? Get in touch with our team &mdash; we&rsquo;re happy to help.</p>
             <a href="#contact" className="btn-primary faq-help-btn">Contact Us <Icon d={ICONS.arrow} size={16} width={2.2} join="round" /></a>
             <div className="faq-help-links">
-              <a href="mailto:sales@unicoolecotech.com"><Icon d={ICONS.mail} size={18} width={1.8} join="round" /> Email Us</a>
+              <a href="mailto:unicoolecotech@gmail.com"><Icon d={ICONS.mail} size={18} width={1.8} join="round" /> Email Us</a>
+              <a href="tel:+919425107017"><Icon d={ICONS.phone} size={18} width={1.8} join="round" /> Call Us</a>
             </div>
           </div>
         </aside>
@@ -604,7 +729,43 @@ function Contact() {
         <div className="eyebrow teal" style={{ marginBottom: 16 }}>GET IN TOUCH</div>
         <h2>Request a Quote</h2>
         <p>Send your size, thickness and quantity &mdash; we quote within one working day.</p>
-        <a href="mailto:sales@unicoolecotech.com" className="btn-mail">sales@unicoolecotech.com</a>
+      </div>
+      <div className="contact-grid">
+        <div className="contact-card">
+          <div className="contact-row">
+            <span className="faq-badge-icon"><Icon d={ICONS.pin} size={20} width={1.8} join="round" /></span>
+            <div>
+              <b>Factory Address</b>
+              <address>Khasra No. 1067/1043, Sakariya Industrial Area,<br />Nimbahera, Chittorgarh &ndash; 312601,<br />Rajasthan, India</address>
+            </div>
+          </div>
+          <div className="contact-row">
+            <span className="faq-badge-icon"><Icon d={ICONS.mail} size={20} width={1.8} join="round" /></span>
+            <div>
+              <b>Email</b>
+              <a href="mailto:unicoolecotech@gmail.com">unicoolecotech@gmail.com</a>
+            </div>
+          </div>
+          <div className="contact-row">
+            <span className="faq-badge-icon"><Icon d={ICONS.phone} size={20} width={1.8} join="round" /></span>
+            <div>
+              <b>Phone</b>
+              <a href="tel:+919425107017">+91 94251 07017</a>
+              <a href="tel:+919833047557">+91 98330 47557</a>
+            </div>
+          </div>
+          <a href="https://maps.app.goo.gl/mJjqMtmLxevVxgHh8" target="_blank" rel="noopener noreferrer" className="btn-primary contact-dir">
+            Get Directions <Icon d={ICONS.arrow} size={16} width={2.2} join="round" />
+          </a>
+        </div>
+        <div className="contact-map">
+          <iframe
+            title="Unicool Ecotech factory location on Google Maps"
+            src="https://maps.google.com/maps?q=24.6075979,74.669559&z=15&output=embed"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
       </div>
     </section>
   );
@@ -621,6 +782,7 @@ export default function App() {
       <Model />
       <Process />
       <About />
+      <Leadership />
       <Why />
       <TrustedBy />
       <Counters />

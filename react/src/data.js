@@ -30,6 +30,8 @@ export const ICONS = {
   expand: 'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7',
   close: 'M18 6 6 18M6 6l12 12',
   mail: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6',
+  pin: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0ZM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z',
 };
 
 export const productHighlights = [
@@ -43,12 +45,13 @@ export const products = [
   {
     photo: 'assets/pad-hero.png', badge: 'Best Seller', name: 'Honeycomb Cooling Pad',
     body: 'Hexagonal cellulose core for maximum wetted surface and low pressure drop.', meta: '50 / 100 / 150 / 200mm',
+    flutes: ['5090', '6090', '7090'],
     features: [['snow', 'High Cooling Efficiency'], ['shield', 'Durable & Long Lasting'], ['leaf', 'Eco Friendly Material']],
   },
   {
-    photo: 'assets/pad-angle-1.png', name: 'Cross-Fluted Pad',
-    body: 'Dual-angle corrugation for turbulent airflow and even water spread.', meta: '5/7mm  /  7/12mm flutes',
-    features: [['waves', 'Turbulent Airflow Design'], ['drop', 'Even Water Distribution'], ['shield', 'High Durability']],
+    photo: 'assets/cooler/cooler-top.webp', name: 'Industrial Air Cooler',
+    body: 'Heavy-duty evaporative cooler for factories, warehouses and sheds, fitted with Unicool honeycomb pads.', meta: 'Side & top discharge',
+    features: [['snow', 'Fitted with Honeycomb Pads'], ['bolt', 'Low Power Consumption'], ['shield', 'Rust-Free Body']],
   },
   {
     photo: 'assets/pad-angle-2.png', name: 'Custom-Cut Panels',
@@ -70,10 +73,16 @@ export const modelPoints = [
   { num: '03', title: 'Optimized Airflow', body: 'The rigid structure maintains shape even after long use, allowing air to pass freely for maximum cooling.', icon: 'M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2' },
 ];
 
+// how a pad is made: 8 in-house stages, each with a real shop-floor photo
 export const processSteps = [
-  { num: '01', title: 'Saturate', body: 'Water trickles down the pad face via distribution troughs, fully wetting the cellulose core.' },
-  { num: '02', title: 'Draw', body: 'Hot dry air is pulled through the cells by the fan, maximizing contact time.' },
-  { num: '03', title: 'Cool', body: 'Water evaporates, absorbing heat and releasing air up to 12°C cooler into the space.' },
+  { short: 'Resin', title: 'Resin Process', photo: 'assets/process/step-1.jpg', body: 'Raw kraft paper is impregnated with special resin, giving it the strength and water resistance to last for years in wet conditions.' },
+  { short: 'Corrugation', title: 'Corrugation Process', photo: 'assets/process/step-2.jpg', body: 'The resin-treated paper runs through precision fluted rollers that press in the exact flute profile, such as 5090, 6090 or 7090.' },
+  { short: 'Heating', title: 'Heating Process', photo: 'assets/process/step-3.jpg', body: 'Corrugated sheets pass through a heating tunnel that sets the resin, so every flute keeps its shape under constant water flow.' },
+  { short: 'Block Formation', title: 'Block Formation Process', photo: 'assets/process/step-4.jpg', body: 'Sheets are stacked layer by layer at alternating angles, forming the cross-fluted honeycomb structure that drives cooling.' },
+  { short: 'Glueing', title: 'Glueing Process', photo: 'assets/process/step-5.jpg', body: 'Each layer is bonded with a water-resistant adhesive, turning loose sheets into one rigid, self-supporting block.' },
+  { short: 'Oven', title: 'Oven (Block Heating) Process', photo: 'assets/process/step-6.jpg', body: 'The complete block is cured in our oven so the glue and resin fully set, locking in strength and shape.' },
+  { short: 'Cutting', title: 'Cutting Process', photo: 'assets/process/step-7.jpg', body: 'Cured blocks are cut on a band saw to the required thickness and size, from standard 50 to 200 mm pads to custom cuts.' },
+  { short: 'Water Testing', title: 'Honeycomb Water Testing', photo: 'assets/process/step-8.jpg', body: 'Finished pads are water-tested for even absorption, smooth drainage and strength before they are packed and shipped.' },
 ];
 
 export const benefits = [
@@ -92,15 +101,19 @@ export const counters = [
   { value: 93, suffix: '%', label: 'Peak cooling efficiency' },
 ];
 
-export const galleryCategories = ['Honeycomb Cooling Pad', 'Cross-Fluted Pad', 'Custom-Cut Panels'];
+export const galleryCategories = ['Honeycomb Cooling Pad', 'Industrial Air Cooler'];
 
+// bg: plain backdrop matching photos shot on a light-grey studio background (cooler body is the same white, so no cutout)
 export const galleryItems = [
   { photo: 'assets/pad-hero.png', cat: 'Honeycomb Cooling Pad', view: 'Front View \u00b7 3D Perspective' },
-  { photo: 'assets/pad-angle-1.png', cat: 'Cross-Fluted Pad', view: 'Side View \u00b7 Angle 1' },
   { photo: 'assets/pad-front.png', cat: 'Honeycomb Cooling Pad', view: 'Top View' },
-  { photo: 'assets/pad-angle-2.png', cat: 'Custom-Cut Panels', view: 'Angle View \u00b7 2' },
-  { photo: 'assets/pad-angle-1-flip.png', cat: 'Cross-Fluted Pad', view: 'Side View \u00b7 Angle 2' },
-  { photo: 'assets/pad-hero-flip.png', cat: 'Honeycomb Cooling Pad', view: 'Perspective View' },
+  { photo: 'assets/pad-angle-1.png', cat: 'Honeycomb Cooling Pad', view: 'Side View' },
+  { photo: 'assets/pad-angle-2.png', cat: 'Honeycomb Cooling Pad', view: 'Flute Size \u00b7 5090' },
+  { photo: 'assets/pad-hero-flip.png', cat: 'Honeycomb Cooling Pad', view: 'Flute Size \u00b7 6090' },
+  { photo: 'assets/pad-angle-1-flip.png', cat: 'Honeycomb Cooling Pad', view: 'Flute Size \u00b7 7090' },
+  { photo: 'assets/cooler/cooler-top.webp', cat: 'Industrial Air Cooler', view: 'Top Discharge \u00b7 3D View' },
+  { photo: 'assets/cooler/cooler-front.jpg', cat: 'Industrial Air Cooler', view: 'Front Grille View', bg: '#f6f6f6' },
+  { photo: 'assets/cooler/cooler-inside.jpg', cat: 'Industrial Air Cooler', view: 'Inside \u00b7 Pads & Fan', bg: '#f7f7f7' },
 ];
 
 export const galleryBadges = [
@@ -117,10 +130,9 @@ export const galleryPerks = [
 ];
 
 export const certifications = [
-  { photo: 'assets/cert/cert-iso.jpg', name: 'ISO 9001', title: 'Quality Management System Certified', body: 'Ensures consistent quality, process control and customer satisfaction at every stage.' },
-  { photo: 'assets/cert/cert-ce.jpg', name: 'CE Compliant', title: 'Meets Applicable European Standards', body: 'Designed and tested to comply with EU health, safety and environmental requirements.' },
+  { photo: 'assets/cert/cert-iso.jpg', name: 'ISO 9001:2015', title: 'Quality Management System Certified', body: 'Ensures consistent quality, process control and customer satisfaction at every stage.' },
+  { photo: 'assets/cert/cert-gmp.jpg', name: 'GMP', title: 'Good Manufacturing Practice Certified', body: 'Clean, controlled and repeatable production, so every batch of pads meets the same standard.' },
   { photo: 'assets/cert/cert-rohs.jpg', name: 'RoHS', title: 'Free of Restricted Hazardous Substances', body: 'No harmful materials like lead, mercury, cadmium, etc. for a safer and healthier environment.' },
-  { photo: 'assets/cert/cert-export.jpg', name: 'Export Ready', title: 'Packaging Built for Long-Distance Shipping', body: 'Strong, durable and well-protected packaging to ensure safe delivery worldwide.' },
 ];
 
 export const certPerks = [
@@ -137,8 +149,8 @@ export const faqs = [
   { q: 'Can you supply custom sizes?', a: 'Yes. We cut pads to your drawing for retrofits, frames and OEM assemblies. Share the height, width, thickness and quantity; a minimum order quantity applies to custom cuts.' },
   { q: 'What is your typical lead time?', a: 'Standard stock sizes ship within 3\u20135 working days. Custom sizes usually take 2\u20133 weeks, depending on quantity.' },
   { q: 'How long do the pads last, and how do I maintain them?', a: 'Under normal duty cycles our pads are rated for 5+ years. To get the full life, use clean water, clean the water tank regularly, and let the fan run for a few minutes after switching off the pump so the pads dry out.' },
-  { q: 'Do you offer dealer or distributor pricing?', a: 'Yes. We offer territory-wise distribution, bulk pricing and OEM-branded supply. To apply, email sales@unicoolecotech.com with your company name and territory.' },
-  { q: 'How do I get a quote?', a: 'Email sales@unicoolecotech.com with the pad size, thickness and quantity you need. We reply with a quote within one working day.' },
+  { q: 'Do you offer dealer or distributor pricing?', a: 'Yes. We offer territory-wise distribution, bulk pricing and OEM-branded supply. To apply, email unicoolecotech@gmail.com or call +91 94251 07017 with your company name and territory.' },
+  { q: 'How do I get a quote?', a: 'Email unicoolecotech@gmail.com or call +91 94251 07017 / +91 98330 47557 with the pad size, thickness and quantity you need. We reply with a quote within one working day.' },
 ];
 
 export const faqBadges = [
