@@ -129,7 +129,7 @@ function Hero({ parallax }) {
           <div className="hero-tag">HONEYCOMB COOLING PAD MANUFACTURER</div>
           <div className="rule" style={{ width: 40, background: '#0b7f77' }} />
         </div>
-        <h1>Cooling pads engineered for <span style={{ color: '#0b7f77' }}>industrial duty.</span></h1>
+        <h1>Evaporative Honeycomb Cooling Pads engineered for <span style={{ color: '#0b7f77' }}>industrial duty.</span></h1>
         <p className="hero-lead">Cross-fluted cellulose honeycomb pads for air coolers, greenhouses and poultry houses &mdash; manufactured in standard and custom sizes for distributors and OEMs.</p>
         <div className="hero-ctas">
           <a href="#contact" className="btn-primary">Request a Quote <span style={{ fontSize: 17, lineHeight: 1 }}>&rarr;</span></a>
